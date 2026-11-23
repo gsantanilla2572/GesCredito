@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet restore GesCredito.slnx
+      - run: dotnet build GesCredito.slnx -c Release --no-restore
+      - name: Pruebas unitarias e integración
+        run: dotnet test GesCredito.slnx -c Release --no-build --logger "trx" --collect:"XPlat Code Coverage"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: resultados-backend
+          path: "**/TestResults/**"
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client/GesCreditoApp
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: client/GesCreditoApp/package-lock.json
+      - run: npm ci
+      - run: npm test -- --watch=false
+      - run: npm run build

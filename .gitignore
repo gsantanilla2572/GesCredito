@@ -1,0 +1,10 @@
+bin/
+obj/
+.vs/
+*.user
+TestResults/
+.env
+node_modules/
+dist/
+.angular/
+*.log

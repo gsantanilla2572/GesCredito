@@ -1,0 +1,41 @@
+# Desarrollo/pruebas locales: docker compose up --build
+# App: http://localhost:8080   API (Swagger): http://localhost:5080/swagger
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${SA_PASSWORD:?defina SA_PASSWORD en .env}
+    ports: ["1433:1433"]
+    volumes: [sqldata:/var/opt/mssql]
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P "$$MSSQL_SA_PASSWORD" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  db-init:
+    image: mcr.microsoft.com/mssql-tools
+    depends_on:
+      sqlserver: { condition: service_healthy }
+    volumes: [./scripts:/scripts:ro]
+    command: /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P ${SA_PASSWORD} -i /scripts/01_CreateDatabase.sql
+    restart: "no"
+
+  api:
+    build: { context: ., dockerfile: docker/api.Dockerfile }
+    depends_on:
+      db-init: { condition: service_completed_successfully }
+    environment:
+      ConnectionStrings__GesCredito: "Server=sqlserver,1433;Database=GesCreditoDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True"
+      Swagger__Enabled: "true"
+    ports: ["5080:8080"]
+
+  web:
+    build: { context: ., dockerfile: docker/web.Dockerfile }
+    depends_on: [api]
+    ports: ["8080:80"]
+
+volumes:
+  sqldata:

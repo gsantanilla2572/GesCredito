@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/GesCredito_Domain/GesCredito_Domain.csproj" />
+    <Project Path="src/GesCredito_Infrastructure/GesCredito_Infrastructure.csproj" />
+    <Project Path="src/GesCredito_Services/GesCredito_Services.csproj" />
+    <Project Path="src/GesCredito_Web/GesCredito_Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/GesCredito_UnitTests/GesCredito_UnitTests.csproj" />
+    <Project Path="tests/GesCredito_IntegrationTests/GesCredito_IntegrationTests.csproj" />
+  </Folder>
+</Solution>
