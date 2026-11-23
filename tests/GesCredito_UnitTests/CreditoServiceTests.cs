@@ -172,7 +172,7 @@ public class CreditoServiceTests
         _creditos.Setup(r => r.BuscarAsync(null, null, 1, 100, It.IsAny<CancellationToken>()))
                  .ReturnsAsync((new List<Credito>(), 0));
 
-        var r = await _service.ListarAsync(null, 0, 5000);
+		var r = await _service.ListarAsync(null, null, 0, 5000);
 
         Assert.Equal(1, r.Page);
         Assert.Equal(100, r.PageSize);

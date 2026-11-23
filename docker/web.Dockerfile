@@ -1,9 +1,9 @@
 # ---- build Angular ----
 FROM node:22 AS build
 WORKDIR /app
-COPY client/GesCreditoApp/package*.json ./
+COPY Frontend/GesCreditoApp/package*.json ./
 RUN npm ci
-COPY client/GesCreditoApp/ ./
+COPY Frontend/GesCreditoApp/ ./
 RUN npm run build
 
 # ---- nginx ----

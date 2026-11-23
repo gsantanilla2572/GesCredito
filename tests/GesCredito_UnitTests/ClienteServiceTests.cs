@@ -100,7 +100,7 @@ public class ClienteServiceTests
         await service.CrearAsync(Dto("2", "Beatriz"));
         await service.CrearAsync(Dto("3", "Carlos"));
 
-        var filtrado = await service.ListarAsync("bea", 1, 10);
+        var filtrado = await service.ListarAsync("Bea", 1, 10);
         var paginado = await service.ListarAsync(null, 1, 2);
 
         Assert.Single(filtrado.Items);
