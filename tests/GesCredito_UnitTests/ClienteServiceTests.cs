@@ -16,9 +16,9 @@ public class ClienteServiceTests
         return (new ClienteService(new ClienteRepository(db), db), db);
     }
 
-    private static ClienteGuardarDto Dto(string id = "123", string nombres = "Ana") => new()
+    private static ClienteGuardarDto Dto(string id = "123", string nombres = "ANA") => new()
     {
-        Identificacion = id, Nombres = nombres, Apellidos = "Pérez", Email = "ana@example.com"
+        Identificacion = id, Nombres = nombres, Apellidos = "PÉREZ", Email = "ana@example.com"
     };
 
     [Fact]
@@ -47,12 +47,12 @@ public class ClienteServiceTests
     {
         var (service, _) = Crear();
         var creado = await service.CrearAsync(Dto());
-        var cambios = Dto(nombres: "Ana María");
+        var cambios = Dto(nombres: "ANA MARÍA");
         cambios.Activo = false;
 
         var actualizado = await service.ActualizarAsync(creado.Id, cambios);
 
-        Assert.Equal("Ana María", actualizado.Nombres);
+        Assert.Equal("ANA MARÍA", actualizado.Nombres);
         Assert.False(actualizado.Activo);
     }
 
@@ -96,11 +96,11 @@ public class ClienteServiceTests
     public async Task Listar_FiltraPorTextoYPagina()
     {
         var (service, _) = Crear();
-        await service.CrearAsync(Dto("1", "Ana"));
-        await service.CrearAsync(Dto("2", "Beatriz"));
-        await service.CrearAsync(Dto("3", "Carlos"));
+        await service.CrearAsync(Dto("1", "ANA"));
+        await service.CrearAsync(Dto("2", "BEATRIZ"));
+        await service.CrearAsync(Dto("3", "CARLOS"));
 
-        var filtrado = await service.ListarAsync("Bea", 1, 10);
+        var filtrado = await service.ListarAsync("BEA", 1, 10);
         var paginado = await service.ListarAsync(null, 1, 2);
 
         Assert.Single(filtrado.Items);
@@ -129,4 +129,20 @@ public class ClienteServiceTests
 
         await Assert.ThrowsAsync<ConflictException>(() => service.EliminarAsync(cliente.Id));
     }
+	[Fact]
+	public async Task Crear_NormalizaTextoAMayusculas()
+	{
+		var (service, _) = Crear();
+		var c = await service.CrearAsync(new ClienteGuardarDto
+		{
+			Identificacion = " ab-1 ", Nombres = "sergio iván", Apellidos = "mora pardo",
+			Email = "Sergio@Example.com", Direccion = "calle 5"
+		});
+
+		Assert.Equal("AB-1", c.Identificacion);
+		Assert.Equal("SERGIO IVÁN", c.Nombres);
+		Assert.Equal("MORA PARDO", c.Apellidos);
+		Assert.Equal("sergio@example.com", c.Email);
+		Assert.Equal("CALLE 5", c.Direccion);
+	}
 }

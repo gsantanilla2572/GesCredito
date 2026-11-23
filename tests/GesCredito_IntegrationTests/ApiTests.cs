@@ -39,7 +39,7 @@ public class ApiTests(ApiFactory factory) : IClassFixture<ApiFactory>
         var creado = await CrearCliente("it-crud");
 
         var get = await _http.GetFromJsonAsync<ClienteDetalleDto>($"/api/clientes/{creado.Id}", ApiFactory.Json);
-        Assert.Equal("it-crud", get!.Identificacion);
+        Assert.Equal("IT-CRUD", get!.Identificacion);
 
         var cambios = NuevoCliente("it-crud");
         cambios.Nombres = "Ana María";

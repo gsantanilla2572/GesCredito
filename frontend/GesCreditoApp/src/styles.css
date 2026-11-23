@@ -40,3 +40,4 @@ dt { font-weight:600; color:#4b5563; } dd { margin:0; }
 .badge.estado-Solicitado { background:#fef9c3; color:#854d0e; }
 .badge.estado-Aprobado { background:#dbeafe; color:#1e40af; }
 .badge.estado-Pagado { background:#e5e7eb; color:#374151; }
+input:not([type="email"]):not([type="number"]):not([type="checkbox"]) { text-transform: uppercase; }

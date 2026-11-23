@@ -19,12 +19,17 @@ public class ClienteRepository(GesCreditoDbContext db) : IClienteRepository
     {
         IQueryable<Cliente> q = db.Clientes.AsNoTracking();
 
-        if (!string.IsNullOrWhiteSpace(search))
-        {
-            var s = search.Trim();
-            q = q.Where(c => c.Nombres.Contains(s) || c.Apellidos.Contains(s) ||
-                             c.Identificacion.Contains(s) || c.Email.Contains(s));
-        }
+		if (!string.IsNullOrWhiteSpace(search))
+		{
+			// Cada palabra debe aparecer en algún campo: "Sergio Mora" encuentra a Sergio Iván Mora Pardo
+			var terminos = search.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+			foreach (var t in terminos)
+			{
+				var termino = t;
+				q = q.Where(c => c.Nombres.Contains(termino) || c.Apellidos.Contains(termino) ||
+								 c.Identificacion.Contains(termino) || c.Email.Contains(termino));
+			}
+		}
 
         var total = await q.CountAsync(ct);
         var items = await q

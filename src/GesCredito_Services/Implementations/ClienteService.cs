@@ -11,7 +11,7 @@ public class ClienteService(IClienteRepository clientes, IUnitOfWork uow) : ICli
     public async Task<PagedResult<ClienteDto>> ListarAsync(string? search, int page, int pageSize, CancellationToken ct = default)
     {
         (page, pageSize) = Paginacion.Normalizar(page, pageSize);
-        var (items, total) = await clientes.BuscarAsync(search, page, pageSize, ct);
+		var (items, total) = await clientes.BuscarAsync(search?.Trim().ToUpperInvariant(), page, pageSize, ct);
         return new PagedResult<ClienteDto>(items.Select(c => c.ToDto()).ToList(), total, page, pageSize);
     }
 
@@ -24,7 +24,7 @@ public class ClienteService(IClienteRepository clientes, IUnitOfWork uow) : ICli
 
     public async Task<ClienteDto> CrearAsync(ClienteGuardarDto dto, CancellationToken ct = default)
     {
-        var identificacion = dto.Identificacion.Trim();
+		var identificacion = dto.Identificacion.Trim().ToUpperInvariant();
         if (await clientes.ExisteIdentificacionAsync(identificacion, null, ct))
             throw new ConflictException($"Ya existe un cliente con identificación {identificacion}.");
 
@@ -62,16 +62,16 @@ public class ClienteService(IClienteRepository clientes, IUnitOfWork uow) : ICli
         await uow.SaveChangesAsync(ct);
     }
 
-    private static void Aplicar(Cliente c, ClienteGuardarDto dto)
-    {
-        c.Identificacion = dto.Identificacion.Trim();
-        c.Nombres = dto.Nombres.Trim();
-        c.Apellidos = dto.Apellidos.Trim();
-        c.Email = dto.Email.Trim();
-        c.Telefono = string.IsNullOrWhiteSpace(dto.Telefono) ? null : dto.Telefono.Trim();
-        c.Direccion = string.IsNullOrWhiteSpace(dto.Direccion) ? null : dto.Direccion.Trim();
-        c.Activo = dto.Activo;
-    }
+	private static void Aplicar(Cliente c, ClienteGuardarDto dto)
+	{
+		c.Identificacion = dto.Identificacion.Trim().ToUpperInvariant();
+		c.Nombres = dto.Nombres.Trim().ToUpperInvariant();
+		c.Apellidos = dto.Apellidos.Trim().ToUpperInvariant();
+		c.Email = dto.Email.Trim().ToLowerInvariant();
+		c.Telefono = string.IsNullOrWhiteSpace(dto.Telefono) ? null : dto.Telefono.Trim();
+		c.Direccion = string.IsNullOrWhiteSpace(dto.Direccion) ? null : dto.Direccion.Trim().ToUpperInvariant();
+		c.Activo = dto.Activo;
+	}
 }
 
 internal static class Paginacion
